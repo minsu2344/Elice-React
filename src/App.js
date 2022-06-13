@@ -2,19 +2,24 @@ import './App.css';
 import {useState} from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import styled from 'styled-components';
 
 function Header(props){
-  const myStyle = {
-    borderBottom: "1px solid gray",
-    padding: '10px',
-    fontSize: '20px',
-  }
-  return <header style={myStyle}><h1><a href="/" onClick={(evt) => {
+  // const myStyle = {
+  //   borderBottom: "1px solid gray",
+  //   padding: '10px',
+  //   fontSize: '20px',
+  // }
+  return <header className={props.className}><h1><a href="/" onClick={(evt) => {
     console.log('evt', evt);
     evt.preventDefault();
     props.onSelect();
   }}>WWW</a></h1></header>
 }
+
+const HeaderStyled = styled(Header)`
+  border-botton: 1px solid gray;
+`;
 
 function Article(props) {
   return <article>
@@ -33,14 +38,34 @@ function Nav(props) {
   return <nav><ol>{liTags}</ol></nav>
 }
 
+function Create({onCreate}) {
+  return (
+    <article>
+      <h2>Create</h2>
+      <form onSubmit={(evt) => {
+        evt.preventDefault();
+        console.dir(evt.target);
+        alert('submit!');
+        const title = evt.target.title.value;
+        const body = evt.target.body.value
+        onCreate(title, body);
+      }}>
+        <p><input type="text" name='title' placeholder='title' /></p>
+        <p><textarea name='body' placeholder='body'></textarea></p>
+        <p><input type="submit" value='Create' /></p>
+      </form>
+    </article>
+  )
+}
+
 function App() {
   const [mode, setMode] = useState('WELCOME');
   const [id, setId] = useState(null);
-
-  const topics = [
+  const [nextId, setNextId] = useState(3);
+  const [topics, setTopics] = useState([
     {id: 1, title:'html', body: 'html is ...'},
     {id: 2, title: 'css', body: 'css is ...'},
-  ];
+  ])
 
   let content = null;
 
@@ -59,6 +84,17 @@ function App() {
     console.log(topic);
     content = <Article title={topic.title} body={topic.body}></Article>
   }
+  else if(mode === 'CREATE') {
+    content = <Create onCreate={(title, body) => {
+      const newTopic = {id: nextId, title, body}
+      const newTopics = [...topics];
+      newTopics.push(newTopic);
+      setTopics(newTopics);
+      setId(nextId);
+      setMode('READ');
+      setNextId(nextId+1);
+    }} />
+  }
 
   // function createHandler() {
   //   alert('create!');
@@ -66,10 +102,10 @@ function App() {
 
   return (
     <div>
-      <Header onSelect={() => {
+      <HeaderStyled onSelect={() => {
         // mode = 'WELCOME';
         setMode('WELCOME');
-      }}></Header>
+      }}></HeaderStyled>
       <Nav data={topics} onSelect={(id) => {
         // mode = 'READ';
         setMode('READ');
@@ -79,6 +115,7 @@ function App() {
       <ButtonGroup variant="contained" aria-label="outlined primary button group">
         {/* <Button variant='outlined' onClick={createHandler}>Create</Button> */}
         <Button variant='outlined' onClick={() => {
+          setMode('CREATE')
           alert('create!');
         }}>Create</Button>
         <Button variant='outlined'>Update</Button>
