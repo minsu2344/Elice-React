@@ -45,7 +45,6 @@ function Create({onCreate}) {
       <form onSubmit={(evt) => {
         evt.preventDefault();
         console.dir(evt.target);
-        alert('submit!');
         const title = evt.target.title.value;
         const body = evt.target.body.value
         onCreate(title, body);
@@ -116,11 +115,14 @@ function App() {
         {/* <Button variant='outlined' onClick={createHandler}>Create</Button> */}
         <Button variant='outlined' onClick={() => {
           setMode('CREATE')
-          alert('create!');
         }}>Create</Button>
         <Button variant='outlined'>Update</Button>
       </ButtonGroup>
-      <Button variant='outlined'>Delete</Button>
+      <Button variant='outlined' onClick={() => {
+        const newTopics = topics.filter(e => e.id !== id);
+        setTopics(newTopics);
+        setMode('WELCOME');
+      }}>Delete</Button>
     </div>
   );
 }
