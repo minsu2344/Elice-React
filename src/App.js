@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { Link, Routes, Route, useParams, useNavigate } from 'react-router-dom';
@@ -71,6 +71,13 @@ function App() {
     { id: 1, title: 'html', body: 'html is ...' },
     { id: 2, title: 'css', body: 'css is ...' },
   ]);
+  useEffect(()=> {
+    (async () => {
+      const res = await fetch('http://localhost:3333/topics');
+      const data = await res.json();
+      setTopics(data);
+    })();
+  }, []);
   const navigate = useNavigate();
 
   return (
@@ -85,7 +92,7 @@ function App() {
         </Route>
         <Route
           path='/create'
-          element={<Create onCreate={onCreateHandler()}/>}>
+          element={<Create onCreate={onCreateHandler}/>}>
         </Route>
         <Route path='/read/:topic_id' element={<Read topics={topics}></Read>}></Route>
       </Routes>
@@ -100,16 +107,17 @@ function App() {
     </div>
   );
 
-  function onCreateHandler() {
-    return (title, body) => {
-      const newTopic = { id: nextId, title, body };
-      const newTopics = [...topics];
-      newTopics.push(newTopic);
-      setTopics(newTopics);
-      setId(nextId);
-      setMode('READ');
-      setNextId(nextId + 1);
-    };
+  async function onCreateHandler(title, body) {
+    const res = await fetch('http://localhost:3333/topics', {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({title, body})
+    });
+    const data = await res.json();
+
+    navigate(`/read/${data.id}`);
   }
 
   function navHandler() {
