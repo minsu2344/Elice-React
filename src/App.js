@@ -2,7 +2,7 @@ import './App.css';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { Link, Routes, Route, useParams } from 'react-router-dom';
+import { Link, Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import { HeaderStyled } from './HeaderStyled';
 import { Article } from './Article';
 import { Nav } from './Nav';
@@ -46,14 +46,14 @@ function Read(props) {
   return <Article title={topic.title} body={topic.body}></Article>
 }
 
-function Control() {
+function Control(props) {
   const params = useParams();
   const id = Number(params.topic_id);
   let contextUI = null;
   if(id) {
     contextUI = <>
       <Button variant='outlined'>Update</Button>
-      <Button variant='outlined'>Delete</Button>
+      <Button variant='outlined' onClick={() => {props.onDelete(id);}}>Delete</Button>
     </>
   }
 
@@ -71,6 +71,7 @@ function App() {
     { id: 1, title: 'html', body: 'html is ...' },
     { id: 2, title: 'css', body: 'css is ...' },
   ]);
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -91,26 +92,11 @@ function App() {
 
       <Routes>
         {['/', '/read/:topic_id', '/update/:topic_id'].map(path => {
-          return <Route key={path} path={path} element={<Control></Control>}></Route>
+          return <Route key={path} path={path} element={<Control onDelete={(id) => {
+            deleteHandler(id);
+          }}></Control>}></Route>
         })}
       </Routes>
-      {/* <ButtonGroup
-        variant='contained'
-        aria-label='outlined primary button group'
-      >
-        <Button
-          component={Link}
-          to='/create'
-          variant='outlined'
-          onClick={createHandler()}
-        >
-          Create
-        </Button>
-        <Button variant='outlined'>Update</Button>
-      <Button variant='outlined' onClick={deleteHandler()}>
-        Delete
-      </Button>
-      </ButtonGroup> */}
     </div>
   );
 
@@ -134,12 +120,16 @@ function App() {
     };
   }
 
-  function deleteHandler() {
-    return () => {
-      const newTopics = topics.filter((e) => e.id !== id);
-      setTopics(newTopics);
-      setMode('WELCOME');
-    };
+  function deleteHandler(id) {
+    const newTopics = topics.filter((e) => {
+      if (e.id === id) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    setTopics(newTopics);
+    navigate('/');
   }
 
   function createHandler() {
