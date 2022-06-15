@@ -33,6 +33,36 @@ function Create({ onCreate }) {
   );
 }
 
+function Read(props) {
+  const params = useParams();
+  const id = Number(params.topic_id);
+  const topic = props.topics.filter((e) => {
+    if (e.id === id) {
+      return true;
+    } else {
+      return false;
+    }
+  })[0];
+  return <Article title={topic.title} body={topic.body}></Article>
+}
+
+function Control() {
+  const params = useParams();
+  const id = Number(params.topic_id);
+  let contextUI = null;
+  if(id) {
+    contextUI = <>
+      <Button variant='outlined'>Update</Button>
+      <Button variant='outlined'>Delete</Button>
+    </>
+  }
+
+  return <>
+    <Button component={Link} to='/create' variant='outlined'>Create</Button>
+    {contextUI}
+  </>
+}
+
 function App() {
   const [mode, setMode] = useState('WELCOME'); // todo 삭제 예정
   const [id, setId] = useState(null); // todo 삭제 예정
@@ -58,7 +88,13 @@ function App() {
         </Route>
         <Route path='/read/:topic_id' element={<Read topics={topics}></Read>}></Route>
       </Routes>
-      <ButtonGroup
+
+      <Routes>
+        {['/', '/read/:topic_id', '/update/:topic_id'].map(path => {
+          return <Route key={path} path={path} element={<Control></Control>}></Route>
+        })}
+      </Routes>
+      {/* <ButtonGroup
         variant='contained'
         aria-label='outlined primary button group'
       >
@@ -71,25 +107,12 @@ function App() {
           Create
         </Button>
         <Button variant='outlined'>Update</Button>
-      </ButtonGroup>
       <Button variant='outlined' onClick={deleteHandler()}>
         Delete
       </Button>
+      </ButtonGroup> */}
     </div>
   );
-
-  function Read(props) {
-    const params = useParams();
-    const id = Number(params.topic_id);
-    const topic = props.topics.filter((e) => {
-      if (e.id === id) {
-        return true;
-      } else {
-        return false;
-      }
-    })[0];
-    return <Article title={topic.title} body={topic.body}></Article>
-  }
 
   function onCreateHandler() {
     return (title, body) => {
