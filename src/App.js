@@ -3,6 +3,7 @@ import {useState} from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import styled from 'styled-components';
+import {Link} from 'react-router-dom';
 
 function Header(props){
   // const myStyle = {
@@ -10,11 +11,10 @@ function Header(props){
   //   padding: '10px',
   //   fontSize: '20px',
   // }
-  return <header className={props.className}><h1><a href="/" onClick={(evt) => {
+  return <header className={props.className}><h1><Link to="/" onClick={(evt) => {
     console.log('evt', evt);
-    evt.preventDefault();
     props.onSelect();
-  }}>WWW</a></h1></header>
+  }}>WWW</Link></h1></header>
 }
 
 const HeaderStyled = styled(Header)`
@@ -30,10 +30,9 @@ function Article(props) {
 
 function Nav(props) {
   const liTags = props.data.map((e) => {
-    return <li key={e.id}><a href={'/read/' + e.id} onClick={(evt) => {
-      evt.preventDefault();
+    return <li key={e.id}><Link to={'/read/' + e.id} onClick={(evt) => {
       props.onSelect(e.id);
-    }}>{e.title}</a></li>
+    }}>{e.title}</Link></li>
   })
   return <nav><ol>{liTags}</ol></nav>
 }
@@ -112,8 +111,7 @@ function App() {
       }}></Nav>
       {content}
       <ButtonGroup variant="contained" aria-label="outlined primary button group">
-        {/* <Button variant='outlined' onClick={createHandler}>Create</Button> */}
-        <Button variant='outlined' onClick={() => {
+        <Button component={Link} to="/create" variant='outlined' onClick={() => {
           setMode('CREATE')
         }}>Create</Button>
         <Button variant='outlined'>Update</Button>
